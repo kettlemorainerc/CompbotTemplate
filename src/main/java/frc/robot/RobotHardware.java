@@ -10,10 +10,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ChangeCentricity;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.LauncherOperations;
-import frc.robot.subsystems.Roomba;
-import frc.robot.subsystems.Shaker;
-import frc.robot.subsystems.MagicCarpet;
+
 
 
 public class RobotHardware{
@@ -53,22 +50,14 @@ public class RobotHardware{
         return instance;
     }
 
-    public final LauncherOperations launcherOperations;
-    public final Roomba roomba;
-    public final MagicCarpet carpet;
-    public final Shaker shaker;
+
     public float speedLimiterDrive;
     public float speedLimiterSpin;
 
     public RobotHardware(){
         instance = this;
 
-        launcherOperations = new LauncherOperations();
-        drivetrain = TunerConstants.createDrivetrain();
-        changeCentricity = new ChangeCentricity();
-        roomba = new Roomba();
-        carpet = new MagicCarpet();
-        shaker = new Shaker();
+
         speedLimiterDrive = 0.2f;
         speedLimiterSpin = 1.0f;
 

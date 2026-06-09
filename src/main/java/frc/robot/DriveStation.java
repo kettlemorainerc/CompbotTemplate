@@ -17,15 +17,13 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.command.*;
 import frc.robot.command.ChangeCentricityControl.Directionality;
 import frc.robot.command.ElasticVisualsControl.SwitchTo;
-import frc.robot.command.RoombaControls.RoombaDirection;
-import frc.robot.command.MagicCarpetControls.CarpetDirection;
 import frc.robot.control.DriveJoystick;
 import frc.robot.control.DriveXboxController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.AlignToAprilTags;
 import frc.robot.subsystems.ChangeCentricity;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.LauncherCalculator;
+
 
 /**
  * This class is intended to be the center point of defining actions that can be utilized during teleop segments of
@@ -109,41 +107,7 @@ public class DriveStation {
 
     /** Bind technical driver button commands here */
     private void bindTechnicalControl(RobotHardware hardware, Joystick secondary) {
-        // new NewTest(Direction.AUTO).bind(new JoystickButton(secondary, 10));
-        // new NewTest(Direction.FORWARD).bind(new JoystickButton(secondary, 11));        
-
-
-        RPMChangeHolder holder = new RPMChangeHolder(3000);
-        RPMChangeHolder visionHolder = new RPMChangeHolder(3000);
-        // RPMChangeHolder holder2 = new RPMChangeHolder(3000);
-        // RPMChangeHolder holder3 = new RPMChangeHolder(4000);
-
-
-        // new PIDHURTSMYHEAD().bind(new JoystickButton(secondary, 19));
-        new LauncherControl(holder).bind(new JoystickButton(secondary, 1));
-        //new LauncherControl(visionHolder).bind(new JoystickButton(secondary, 1));
-        new LauncherControl(200.0 , holder, false).bind(new JoystickButton(secondary, 4));
-        new LauncherControl(-200.0 , holder, false).bind(new JoystickButton(secondary, 8));
-        //new LauncherControl(LauncherCalculator.getRPMFromDistance(), visionHolder, true).bind(new JoystickButton(secondary, 1));
         
-
-        new RoombaControls(RoombaDirection.START).bind(new JoystickButton(secondary,2));
-        // new RoombaControls(RoombaDirection.REVERSE).bind(new JoystickButton(secondary,9));
-
-        new MagicCarpetControls(CarpetDirection.FALL, holder).bind(new JoystickButton(secondary,3));
-        new MagicCarpetControls(CarpetDirection.FLY, holder).bind(new JoystickButton(secondary,6));
-        //new MagicCarpetControls(CarpetDirection.FALL, holder).bind(new JoystickButton(secondary,1));
-
-        new ElasticVisualsControl(SwitchTo.MAIN).bind(new JoystickButton(secondary, 9));
-        new ElasticVisualsControl(SwitchTo.FIELD).bind(new JoystickButton(secondary, 10));
-
-        // new AlignToAprilTags().bind(new JoystickButton(secondary, 20));
-
-        // new .bind(new JoystickButton(secondary, 19));
-        // new LaucherControl(2000).bind(new JoystickButton(secondary, 2));
-        // new ChangeCentricityControl().bind(new JoystickButton(secondary, 2));
-        // final TestControl testControl = new TestControl();
-        //testControl.bind(new JoystickButton(secondary,1));
       
     }
 
