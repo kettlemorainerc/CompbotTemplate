@@ -136,8 +136,6 @@ public class DriveStation {
     }
 
     private static Joystick getNumpad() {
-        System.out.println("getNumpad!!!");
-
         return new Joystick(NUMPAD_PORT);
     }
 
