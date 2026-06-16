@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
 
   Random random = new Random();
 
-
+  //Used for PID Interface for testing
   private double oldP1 = 0;
   private double oldP2 = 0;
   private double oldI1 = 0;
@@ -54,10 +54,6 @@ public class Robot extends TimedRobot {
   public static final Field2d m_field = new Field2d();
   public static final Field2d t_field = new Field2d();
 
-  //PhotonCamera camera = new PhotonCamera("Camera_Module_v1");
-  private SparkMax leftLauncherMotor;
-
-
   @Override public void robotInit() {
     hardware = new RobotHardware();
     driveStation = new DriveStation(hardware);
@@ -67,15 +63,13 @@ public class Robot extends TimedRobot {
 
     this.drivetrain = RobotHardware.getInstance().drivetrain;
 
-    CameraServer.startAutomaticCapture();
+    CameraServer.startAutomaticCapture(); //Maybe delete this? We dont know what it does (could be for limelight or photon? )
 
 
 // TODO: THIS IS FINE, WE WILL MOVE THIS
 
     elastic = new ElasticControls(drivetrain);
     
-    leftLauncherMotor = hardware.leftLauncherMotor;
-
 
     // TODO: We will also move this   // Do this in either robot or subsystem init
   
@@ -107,14 +101,16 @@ public class Robot extends TimedRobot {
     // Do this in either robot periodic or subsystem periodic
     
     SmartDashboard.putNumber("Match Timer", Timer.getMatchTime());
-    SmartDashboard.putNumber("Motor Rpm", leftLauncherMotor.getEncoder().getVelocity());
     SmartDashboard.putNumber("Battery Voltage", voltage);
+    // SmartDashboard.putNumber("Motor Rpm", [INSERT MOTOR NAME].getEncoder().getVelocity());
     t_field.setRobotPose(FieldLocationsHelper.getHubTargetPosition());
     // SmartDashboard.putData("PID", PIDConfigureAuto);
   
     var state = drivetrain.getState();
     Pose2d pose = state.Pose;
     m_field.setRobotPose(pose);
+
+    //PID Interface Start
 
     if(SmartDashboard.getNumber("P1", 0) != oldP1){
       drivetrain.configureAuto(SmartDashboard.getNumber("P1", 0), SmartDashboard.getNumber("I1", 0), SmartDashboard.getNumber("D1", 0), SmartDashboard.getNumber("P2", 0), SmartDashboard.getNumber("I2", 0), SmartDashboard.getNumber("D2", 0));
@@ -146,6 +142,8 @@ public class Robot extends TimedRobot {
       m_AutonomousContol.registerCommands();
       oldD2 = SmartDashboard.getNumber("D2", 0);
     }
+
+    //PID Interface End
 
     if(SmartDashboard.getNumber("Drive Limit", 1.0f) != oldDriveLimit){
       RobotHardware.getInstance().speedLimiterDrive = (float) SmartDashboard.getNumber("Drive Limit", 0.1f);
