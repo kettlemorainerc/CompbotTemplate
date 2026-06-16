@@ -57,9 +57,12 @@ public class RobotHardware{
     public RobotHardware(){
         instance = this;
 
-
         speedLimiterDrive = 0.2f;
         speedLimiterSpin = 1.0f;
+
+        //Drive train
+        drivetrain = TunerConstants.createDrivetrain();
+        changeCentricity = new ChangeCentricity();
 
 
         // Launcher motors
@@ -78,6 +81,7 @@ public class RobotHardware{
             .pid(0.0001, 0.0, 0.0)
             .velocityFF(1.0 / 5676.0); 
         leftLauncherMotor.configure(leftLauncherMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
         SparkMaxConfig rightLauncherMotorConfig = new SparkMaxConfig();
         rightLauncherMotorConfig
             .inverted(!LEFT_INVERSION_STATUS)
