@@ -62,7 +62,25 @@ public class RobotHardware{
         changeCentricity = new ChangeCentricity();
 
 
-    //Example of one mechanism using two motors at once
+        //Example of one mechanism using two motors at once
+        SparkMax exampleMotor = new SparkMax(0, MotorType.kBrushless);
+
+        SparkMaxConfig exampleMotorConfig = new SparkMaxConfig();
+        exampleMotorConfig
+            .inverted(LEFT_INVERSION_STATUS)
+            .idleMode(IdleMode.kCoast);
+        exampleMotorConfig.encoder
+            .positionConversionFactor(1) //Note to future self, use a factor of 1 for standard RPM
+            .velocityConversionFactor(1);
+        exampleMotorConfig.closedLoop
+            .feedbackSensor(com.revrobotics.spark.FeedbackSensor.kPrimaryEncoder)
+            .pid(0.0001, 0.0, 0.0)
+            .velocityFF(1.0 / 5676.0); 
+        exampleMotor.configure(exampleMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        //Example of one mechanism using two motors at once
+        SparkMax leftLauncherMotor = new SparkMax(1, MotorType.kBrushless);
+        SparkMax rightLauncherMotor = new SparkMax(2, MotorType.kBrushless);
 
         SparkMaxConfig leftLauncherMotorConfig = new SparkMaxConfig();
         leftLauncherMotorConfig
@@ -90,30 +108,4 @@ public class RobotHardware{
             .velocityFF(1.0 / 5676.0); 
         rightLauncherMotor.configure(rightLauncherMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
-
-    //     SparkMaxConfig leftLauncherMotorConfig = new SparkMaxConfig();
-    //     leftLauncherMotorConfig
-    //         .inverted(LEFT_INVERSION_STATUS)
-    //         .idleMode(IdleMode.kCoast);
-    //     leftLauncherMotorConfig.encoder
-    //         .positionConversionFactor(1) //Note to future self, use a factor of 1 for standard RPM
-    //         .velocityConversionFactor(1);
-    //     leftLauncherMotorConfig.closedLoop
-    //         .feedbackSensor(com.revrobotics.spark.FeedbackSensor.kPrimaryEncoder)
-    //         .pid(0.0001, 0.0, 0.0)
-    //         .velocityFF(1.0 / 5676.0); 
-    //     leftLauncherMotor.configure(leftLauncherMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    //     SparkMaxConfig rightLauncherMotorConfig = new SparkMaxConfig();
-    //     rightLauncherMotorConfig
-    //         .inverted(!LEFT_INVERSION_STATUS)
-    //         .idleMode(IdleMode.kCoast);
-    //     rightLauncherMotorConfig.encoder
-    //         .positionConversionFactor(1) //Note to future self, use a factor of 1 for standard RPM
-    //         .velocityConversionFactor(1);
-    //     rightLauncherMotorConfig.closedLoop
-    //         .feedbackSensor(com.revrobotics.spark.FeedbackSensor.kPrimaryEncoder)
-    //         .pid(0.0001, 0.0, 0.0)
-    //         .velocityFF(1.0 / 5676.0); 
-    //     rightLauncherMotor.configure(rightLauncherMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    // }
 }
