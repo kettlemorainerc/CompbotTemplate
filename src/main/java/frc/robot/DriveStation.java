@@ -8,10 +8,16 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.FollowPathCommand;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.*;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.command.*;
@@ -68,6 +74,8 @@ public class DriveStation {
 
     CommandSwerveDrivetrain drivetrain = RobotHardware.getInstance().drivetrain;
 
+    private final SendableChooser<Command> autoChooser;
+
     public DriveStation(RobotHardware hardware) {
         /** Set the driver's control method this MUST be a {@link DriveStick} implementation */
         //driveStick = getFlysky();
@@ -79,8 +87,19 @@ public class DriveStation {
         //technicalStick = getTechnicalJoystick();
         technicalStick = getNumpad();
 
+        registerAutoCommands();
+        
+        autoChooser = AutoBuilder.buildAutoChooser();
+        SmartDashboard.putData("Auto Mode", autoChooser);
+
         bind(hardware);
         configureBindings();
+
+        CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
+    }
+
+    private void registerAutoCommands(){
+        //NamedCommands.registerCommand("Debug", Commands.print("DEBUG registerCommands"));
     }
 
     /**
@@ -181,6 +200,10 @@ public class DriveStation {
 
     public CommandXboxController getController(){
         return driveNewJoystick;
+    }
+
+    public Command getAutonomousCommand(){
+        return autoChooser.getSelected();
     }
 
 }

@@ -55,6 +55,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
 
+    private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
     /* Swerve requests to apply during SysId characterization */
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
     private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
@@ -62,10 +63,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-
-    public static final SwerveRequest.RobotCentric drive = new SwerveRequest.RobotCentric()
-        .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-        .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
@@ -147,6 +144,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
+        configureAutoBuilder();
     }
 
     /**
@@ -171,6 +169,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
+        configureAutoBuilder();
     }
 
     /**
@@ -202,6 +201,32 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         super(drivetrainConstants, odometryUpdateFrequency, odometryStandardDeviation, visionStandardDeviation, modules);
         if (Utils.isSimulation()) {
             startSimThread();
+        }
+        configureAutoBuilder();
+    }
+
+    private void configureAutoBuilder(){
+        try {
+            var config = RobotConfig.fromGUISettings();
+            AutoBuilder.configure(
+                () -> getState().Pose,
+                this::resetPose,
+                () -> getState().Speeds,
+                (speeds, feedforwards) -> setControl(
+                    m_pathApplyRobotSpeeds.withSpeeds(ChassisSpeeds.discretize(speeds, 0.020))
+                        .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                        .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
+                ),
+                new PPHolonomicDriveController(
+                    new PIDConstants(10, 0, 0),
+                    new PIDConstants(7, 0, 0)
+                ),
+                config,
+                () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+                this                
+            );
+        } catch (Exception e) {
+            // TODO: handle exception
         }
     }
 
@@ -319,61 +344,62 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
 
-    public Pose2d getPose(){
-        Pose2d pose = Robot.m_field.getRobotPose();
-        // System.out.println(pose);
-        return pose;
-    }
+    // public Pose2d getPose(){
+    //     Pose2d pose = Robot.m_field.getRobotPose();
+    //     // System.out.println(pose);
+    //     return pose;
+    // }
     
-    public ChassisSpeeds getCurrentSpeeds(){
-        return getKinematics().toChassisSpeeds(getModule(0).getCurrentState(), getModule(1).getCurrentState(), getModule(2).getCurrentState(), getModule(3).getCurrentState());
-    }
+    // public ChassisSpeeds getCurrentSpeeds(){
+    //     return getKinematics().toChassisSpeeds(getModule(0).getCurrentState(), getModule(1).getCurrentState(), getModule(2).getCurrentState(), getModule(3).getCurrentState());
+    // }
     
-    public void driveRobotRelative(ChassisSpeeds speeds){
-        // System.out.println(speeds.vxMetersPerSecond);
-        // System.out.println(speeds.vyMetersPerSecond);
-        // System.out.println(speeds.omegaRadiansPerSecond);
-        setControl(
-                drive.withVelocityX(speeds.vxMetersPerSecond) // Drive forward with negative Y (forward)
-                    .withVelocityY(speeds.vyMetersPerSecond) // Drive left with negative X (left)
-                    .withRotationalRate(speeds.omegaRadiansPerSecond) // Drive counterclockwise with negative X (left)
-            );
-    }
+    // public void driveRobotRelative(ChassisSpeeds speeds){
+    //     // System.out.println(speeds.vxMetersPerSecond);
+    //     // System.out.println(speeds.vyMetersPerSecond);
+    //     // System.out.println(speeds.omegaRadiansPerSecond);
+    //     setControl(
+    //             drive.withVelocityX(speeds.vxMetersPerSecond) // Drive forward with negative Y (forward)
+    //                 .withVelocityY(speeds.vyMetersPerSecond) // Drive left with negative X (left)
+    //                 .withRotationalRate(speeds.omegaRadiansPerSecond) // Drive counterclockwise with negative X (left)
+    //         );
+    // }
 
-    public void configureAuto(double p1, double i1, double d1, double p2, double i2, double d2){
-        System.out.println("configuredAuto values: " + p1 + " " + p2 + " " + i1 + " " + i2 + " " + d1 + " " + d2);
-        RobotConfig config;
-        try {
-            config = RobotConfig.fromGUISettings();
+    //Configures auto with the given pid values with pid1 for drive and pid2 for steer
+    // public void configureAuto(double p1, double i1, double d1, double p2, double i2, double d2){
+    //     System.out.println("configuredAuto values: " + p1 + " " + p2 + " " + i1 + " " + i2 + " " + d1 + " " + d2);
+    //     RobotConfig config;
+    //     try {
+    //         config = RobotConfig.fromGUISettings();
 
-            AutoBuilder.resetForTesting();
+    //         AutoBuilder.resetForTesting();
 
-            AutoBuilder.configure(
-                this::getPose, // Robot pose supplier
-                this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
-                this::getCurrentSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-                new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                        new PIDConstants(p1, i1, d1), // Translation PID constants
-                        new PIDConstants(p2, i2, d2) // Rotation PID constants
-                ),
-                config, // The robot configuration
-                () -> { 
-                // Boolean supplier that controls when the path will be mirrored for the red alliance
-                // This will flip the path being followed to the red side of the field.
-                // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+    //         AutoBuilder.configure(
+    //             this::getPose, // Robot pose supplier
+    //             this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+    //             this::getCurrentSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+    //             (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+    //             new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+    //                     new PIDConstants(p1, i1, d1), // Translation PID constants
+    //                     new PIDConstants(p2, i2, d2) // Rotation PID constants
+    //             ),
+    //             config, // The robot configuration
+    //             () -> { 
+    //             // Boolean supplier that controls when the path will be mirrored for the red alliance
+    //             // This will flip the path being followed to the red side of the field.
+    //             // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-                var alliance = DriverStation.getAlliance();
-                if (alliance.isPresent()) {
-                    return alliance.get() == DriverStation.Alliance.Red;
-                }
-                return false;
-                },
-                this // Reference to this subsystem to set requirements
+    //             var alliance = DriverStation.getAlliance();
+    //             if (alliance.isPresent()) {
+    //                 return alliance.get() == DriverStation.Alliance.Red;
+    //             }
+    //             return false;
+    //             },
+    //             this // Reference to this subsystem to set requirements
 
-            );
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }            
-    }
+    //         );
+    //     } catch (IOException | ParseException e) {
+    //         e.printStackTrace();
+    //     }            
+    // }
 }

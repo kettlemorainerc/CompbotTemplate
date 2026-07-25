@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.command.PIDConfigureAuto;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.FieldLocationsHelper;
 import frc.robot.subsystems.FieldLocationsHelper.AngleDistance;
@@ -57,10 +56,6 @@ public class Robot extends TimedRobot {
   @Override public void robotInit() {
     hardware = new RobotHardware();
     driveStation = new DriveStation(hardware);
-    m_AutonomousContol  = new AutonomousContol();
-    drivetrain = RobotHardware.getInstance().drivetrain;
-
-
     this.drivetrain = RobotHardware.getInstance().drivetrain;
 
     CameraServer.startAutomaticCapture(); //Maybe delete this? We dont know what it does (could be for limelight or photon? )
@@ -112,37 +107,7 @@ public class Robot extends TimedRobot {
 
     //PID Interface Start
 
-    if(SmartDashboard.getNumber("P1", 0) != oldP1){
-      drivetrain.configureAuto(SmartDashboard.getNumber("P1", 0), SmartDashboard.getNumber("I1", 0), SmartDashboard.getNumber("D1", 0), SmartDashboard.getNumber("P2", 0), SmartDashboard.getNumber("I2", 0), SmartDashboard.getNumber("D2", 0));
-      m_AutonomousContol.registerCommands();
-      oldP1 = SmartDashboard.getNumber("P1", 0);
-    }
-    if(SmartDashboard.getNumber("P2", 0) != oldP2){
-      drivetrain.configureAuto(SmartDashboard.getNumber("P1", 0), SmartDashboard.getNumber("I1", 0), SmartDashboard.getNumber("D1", 0), SmartDashboard.getNumber("P2", 0), SmartDashboard.getNumber("I2", 0), SmartDashboard.getNumber("D2", 0));
-      m_AutonomousContol.registerCommands();
-      oldP2 = SmartDashboard.getNumber("P2", 0);
-    }
-    if(SmartDashboard.getNumber("I1", 0) != oldI1){
-      drivetrain.configureAuto(SmartDashboard.getNumber("P1", 0), SmartDashboard.getNumber("I1", 0), SmartDashboard.getNumber("D1", 0), SmartDashboard.getNumber("P2", 0), SmartDashboard.getNumber("I2", 0), SmartDashboard.getNumber("D2", 0));
-      m_AutonomousContol.registerCommands();
-      oldI1 = SmartDashboard.getNumber("I1", 0);
-    }
-    if(SmartDashboard.getNumber("I2", 0) != oldI2){
-      drivetrain.configureAuto(SmartDashboard.getNumber("P1", 0), SmartDashboard.getNumber("I1", 0), SmartDashboard.getNumber("D1", 0), SmartDashboard.getNumber("P2", 0), SmartDashboard.getNumber("I2", 0), SmartDashboard.getNumber("D2", 0));
-      m_AutonomousContol.registerCommands();
-      oldI2 = SmartDashboard.getNumber("I2", 0);
-    }
-    if(SmartDashboard.getNumber("D1", 0) != oldD1){
-      drivetrain.configureAuto(SmartDashboard.getNumber("P1", 0), SmartDashboard.getNumber("I1", 0), SmartDashboard.getNumber("D1", 0), SmartDashboard.getNumber("P2", 0), SmartDashboard.getNumber("I2", 0), SmartDashboard.getNumber("D2", 0));
-      m_AutonomousContol.registerCommands();
-      oldD1 = SmartDashboard.getNumber("D1", 0);
-    }
-    if(SmartDashboard.getNumber("D2", 0) != oldD2){
-      drivetrain.configureAuto(SmartDashboard.getNumber("P1", 0), SmartDashboard.getNumber("I1", 0), SmartDashboard.getNumber("D1", 0), SmartDashboard.getNumber("P2", 0), SmartDashboard.getNumber("I2", 0), SmartDashboard.getNumber("D2", 0));
-      m_AutonomousContol.registerCommands();
-      oldD2 = SmartDashboard.getNumber("D2", 0);
-    }
-
+    
     //PID Interface End
 
     if(SmartDashboard.getNumber("Drive Limit", 1.0f) != oldDriveLimit){
@@ -179,7 +144,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_AutonomousContol.getAutonomousCommand();
+    m_autonomousCommand = driveStation.getAutonomousCommand();
 
     if(m_autonomousCommand != null){
       CommandScheduler.getInstance().schedule(m_autonomousCommand);
@@ -199,7 +164,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+      CommandScheduler.getInstance().cancel(m_autonomousCommand);
     }
   }
 
