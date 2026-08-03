@@ -27,7 +27,6 @@ import frc.robot.subsystems.FieldLocationsHelper.AngleDistance;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-  private AutonomousContol m_AutonomousContol;
   private DriveStation driveStation;
   private RobotHardware hardware;
   double timeRemaining = Timer.getMatchTime();
