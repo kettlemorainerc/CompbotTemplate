@@ -38,14 +38,6 @@ public class Robot extends TimedRobot {
 
   Random random = new Random();
 
-  //Used for PID Interface for testing
-  private double oldP1 = 0;
-  private double oldP2 = 0;
-  private double oldI1 = 0;
-  private double oldI2 = 0;
-  private double oldD1 = 0;
-  private double oldD2 = 0;
-
   private float oldDriveLimit = 0.2f;
   private float oldRotateLimit = 1.0f;
 
@@ -57,7 +49,9 @@ public class Robot extends TimedRobot {
     driveStation = new DriveStation(hardware);
     this.drivetrain = RobotHardware.getInstance().drivetrain;
 
-    CameraServer.startAutomaticCapture(); //Maybe delete this? We dont know what it does (could be for limelight or photon? )
+
+    // USB Camera
+    CameraServer.startAutomaticCapture(); 
 
 
 // TODO: THIS IS FINE, WE WILL MOVE THIS
