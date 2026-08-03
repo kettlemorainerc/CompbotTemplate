@@ -68,12 +68,6 @@ public class Robot extends TimedRobot {
     // TODO: We will also move this   // Do this in either robot or subsystem init
   
     SmartDashboard.putData("Field", m_field);
-    SmartDashboard.putNumber("P1", 0);
-    SmartDashboard.putNumber("I1", 0);
-    SmartDashboard.putNumber("D1", 0);
-    SmartDashboard.putNumber("P2", 0);
-    SmartDashboard.putNumber("I2", 0);
-    SmartDashboard.putNumber("D2", 0);
 
     SmartDashboard.putNumber("Drive Limit", 0.1f);
     SmartDashboard.putNumber("Rotation Limiter", 0.5f);
